@@ -1,7 +1,7 @@
 {
   "name": "speedometer",
   "version": "0.0.1",
-  "description": "speedometer for node.js",
+  "description": "speedometer",
   "repository": {
     "type": "git",
     "url": "https://github.com/nathanfaucett/Speedometer.git"

@@ -19,7 +19,7 @@
         }
     );
 
-    now = function() {
+    now = function now() {
         return performance.now();
     };
 
@@ -46,10 +46,10 @@
     /*
      * Speedometer(options Object)
      *   options {
-     *     id: String (document id selector) uses getElementById to find defaults to "speedometer"
-     *     width: Number width of speedometer defaults to 256
-     *     height: Number height of speedometer defaults to 256
-     *     total: max number the speedometer can be defaults to 100
+     *     id: String (document id selector) uses getElementById to find, defaults to "speedometer"
+     *     width: Number width of speedometer, defaults to 256
+     *     height: Number height of speedometer, defaults to 256
+     *     total: max number the speedometer can be, defaults to 100
      *   }
      */
     function Speedometer(options) {
@@ -58,8 +58,8 @@
 
         this.element = document.getElementById((typeof(options.id) === "string" ? options.id : "speedometer"));
 
-        this.width = options.width === +options.width ? options.width : 256;
-        this.height = options.height === +options.height ? options.height : 256;
+        this.width = (options.width = +options.width) ? options.width : 256;
+        this.height = (options.height = +options.height) ? options.height : 256;
 
         this.canvas = null;
         this.ctx = null;
@@ -71,18 +71,24 @@
         this.difference = 0.0;
 
         this.dt = 1 / 60;
-        this.requestId = null;
+
+        this._run = false;
+        this._requestId = null;
 
         var _this = this,
             current = 0,
             last = -1 / 60;
+
         this._update = function _update() {
             last = current;
             current = now();
             _this.dt = (current - last) * 0.001;
 
             _this.draw();
-            _this.requestId = window.requestAnimationFrame(_this._update, _this.canvas);
+
+            if (_this._run) {
+                _this._requestId = window.requestAnimationFrame(_this._update, _this.canvas);
+            }
         }
 
         return this.init(((options.value = +options.value) && options.value > 0) ? (options.value <= this.total ? options.value : this.total) : 0);
@@ -109,16 +115,20 @@
     };
 
     Speedometer.prototype.start = function() {
-        if (!this.requestId) {
+        if (!this._requestId) {
+            this._run = true;
             this._update();
         }
+        return this;
     };
 
     Speedometer.prototype.stop = function() {
-        if (this.requestId) {
-            window.cancelAnimationFrame(this.requestId);
-            this.requestId = null;
+        if (this._requestId) {
+            window.cancelAnimationFrame(this._requestId);
+            this._requestId = null;
+            this._run = false;
         }
+        return this;
     };
 
     /*
@@ -145,11 +155,8 @@
         var ctx = this.ctx,
             radius = (this.height - 2) * 0.5;
 
-        if (this.current >= this.difference) {
-            this.stop();
-            return this;
-        }
         this.current += this.difference * this.dt;
+        if (this.current >= this.difference) this.stop();
 
         ctx.clearRect(-this.width * 0.5, -this.height * 0.5, this.width, this.height);
 
@@ -175,7 +182,7 @@
 
         ctx.fillStyle = "#ddd";
 
-        ctx.rotate((this.current * Math.PI * 1.25) + Math.PI * 0.625);
+        ctx.rotate((Math.PI * 0.625) - (this.current * Math.PI * 1.25));
 
         ctx.beginPath();
         ctx.moveTo(0, height);
