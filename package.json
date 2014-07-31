@@ -16,7 +16,7 @@
   "readmeFilename": "README.md",
   "devDependencies": {
     "grunt": "",
+    "grunt-contrib-uglify": "^0.5.1",
     "grunt-jsbeautifier": ""
   }
 }
-

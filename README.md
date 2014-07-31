@@ -15,11 +15,21 @@ the total you passed, defaults to 100
 ####Speedometer.set function (Number)
 sets value and renders Speedometer
 
-##Events
-set functions to values for them to be called
+####Speedometer.setWidth function (Number)
+sets width of Speedometer
 
-####Speedometer.onload
-called after image has been loaded
+####Speedometer.setHeight function (Number)
+sets height of Speedometer
+
+##Events
+pass functions in options or set them on options for them to be called
+Speedometer instance bound to events
+
+####Speedometer.onstart
+called when animation starts
+
+####Speedometer.onend
+called when animation ends
 
 ####Speedometer.onupdate
 called during animation
@@ -29,20 +39,30 @@ called during animation
 
 ```javascript
 var speedometer = new Speedometer({
-  id: "speedometer", // id of element to put Speedometer in
-  height: 256, // height of canvas
-  value: 0,
+  id: "speedometer",
+
+  backgroundColor: "#d1d1d1",
+  barColor: "#ff8800",
+  
+  easing: "easeOutElastic",
+  
+  duration: 2000,
+  height: 256,
+  value: 50,
   total: 100,
-  backgroundColor: "#ddd",
-  barColor: "#ff8800"
+  
+  onstart: function() {
+    info.innerHTML = "ON START";
+  },
+  
+  onend: function() {
+    info.innerHTML = "ON END";
+  },
+  
+  onupdate: function() {
+    var value = this.current * this.total;
+    
+    count.innerHTML = (value * 100 | 0) / 100 +"/"+ this.total;
+  }
 });
-
-
-speedometer.onload = function() {
-  speedometer.set(75);
-};
-
-speedometer.onupdate = function() {
-  console.log(speedometer.current * speedometer.total);
-};
 ```

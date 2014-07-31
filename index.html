@@ -1,48 +1,65 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        
-        <meta http-equiv="cleartype" content="on">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        
-        <meta name="apple-mobile-web-app-status-bar-style" content="black" /> 
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        
-        <meta name="description" content="">
-        <meta name="keywords" content="">
-        
-        <title>Speedometer</title>
-		
-    </head>
-    
-    <body style="background: #f1f1f1;">
+  <head>
+      
+      <meta http-equiv="cleartype" content="on">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      
+      <meta name="apple-mobile-web-app-status-bar-style" content="black" /> 
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      
+      <meta name="description" content="">
+      <meta name="keywords" content="">
+      
+      <title>Speedometer</title>
+  
+      <style>
+        #speedometer canvas{
+          border-bottom: 2px solid #000;
+        }
+      </style>
+  </head>
+  
+  <body style="background: #f1f1f1;">
 		
 		<div id="speedometer">
-      <p id="speedometer-count"></p>
+      <p id="speedometer-count">0/0</p>
+      <p id="speedometer-info">Event</p>
     </div>
     
-		<script type="text/javascript" src="./index.js"></script>
+		<script type="text/javascript" src="./speedometer.js"></script>
+    
+    <!-- Example Code -->
 		<script type="text/javascript">
-      var speedometer = new Speedometer({
+      var info = document.getElementById("speedometer-info"),
+        count = document.getElementById("speedometer-count"),
+        speedometer = new Speedometer({
           id: "speedometer",
-          backgroundColor: "#ddd",
+          
+          backgroundColor: "#d1d1d1",
           barColor: "#ff8800",
-          speed: 2.5,
+          
+          easing: "easeOutElastic",
+          
+          duration: 2000,
           height: 256,
-          value: 0,
-          total: 100
-        }),
-        el = document.getElementById("speedometer-count");
-      
-      speedometer.onload = function() {
-        speedometer.set(75);
-      };
-      
-      speedometer.onupdate = function() {
-        var value = speedometer.current * speedometer.total;
-        
-        el.innerHTML = (value * 100 | 0) / 100 +"/"+ speedometer.total;
-      };
+          value: 50,
+          total: 100,
+          
+          onstart: function() {
+            info.innerHTML = "ON START";
+          },
+          
+          onend: function() {
+            info.innerHTML = "ON END";
+          },
+          
+          onupdate: function() {
+            var value = this.current * this.total;
+            
+            count.innerHTML = (value * 100 | 0) / 100 +"/"+ this.total;
+          }
+        });
     </script>
     
 	</body>
