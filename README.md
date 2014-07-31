@@ -29,11 +29,20 @@ called during animation
 
 ```javascript
 var speedometer = new Speedometer({
-  id: "speedometer",
-  height: 256,
-  value: 50,
-  total: 100
+  id: "speedometer", // id of element to put Speedometer in
+  height: 256, // height of canvas
+  value: 0,
+  total: 100,
+  backgroundColor: "#ddd",
+  barColor: "#ff8800"
 });
 
-speedometer.set(75)
+
+speedometer.onload = function() {
+  speedometer.set(75);
+};
+
+speedometer.onupdate = function() {
+  console.log(speedometer.current * speedometer.total);
+};
 ```
