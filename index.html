@@ -15,7 +15,7 @@
   
       <style>
         #speedometer canvas{
-          border-bottom: 2px solid #000;
+          border-bottom: 3px solid #888;
         }
       </style>
   </head>
@@ -27,7 +27,7 @@
       <p id="speedometer-info">Event</p>
     </div>
     
-		<script type="text/javascript" src="./speedometer.js"></script>
+		<script type="text/javascript" src="./speedometer.min.js"></script>
     
     <!-- Example Code -->
 		<script type="text/javascript">
@@ -55,9 +55,10 @@
           },
           
           onupdate: function() {
-            var value = this.current * this.total;
+            var current = this.current >= 1 ? 1 : (this.current <= 0 ? 0 : this.current),
+                value = current * this.total;
             
-            count.innerHTML = (value * 100 | 0) / 100 +"/"+ this.total;
+            count.innerHTML = (value | 0) +"/"+ this.total;
           }
         });
     </script>
