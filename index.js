@@ -44,6 +44,13 @@
         window.clearTimeout
     );
 
+    function easeInOutQuad(b, c, d, t) {
+        t /= d / 2;
+        if (t < 1) return c / 2 * t * t + b;
+        t--;
+        return -c / 2 * (t * (t - 2) - 1) + b;
+    }
+
     function loadImage(src, callback) {
         var image = new Image();
 
@@ -80,6 +87,8 @@
         this.canvas = null;
         this.ctx = null;
 
+        this.speed = ((options.speed = +options.speed) && options.speed > 0) ? options.speed : 1;
+
         this.total = ((options.total = +options.total) && options.total > 0) ? options.total : 100;
         this.value = 0;
 
@@ -89,13 +98,6 @@
         this.from = 0;
         this.current = 0;
 
-        this.startAngle = Math.PI * 0.875;
-        this.currentStartAngle = this.startAngle;
-        this.currentEndAngle = this.startAngle + (Math.PI * 1.125);
-
-        this.arrowStartAngle = Math.PI * -0.63;
-        this.arrowAngle = 0;
-
         this.dt = 1 / 60;
         this._current = 0;
 
@@ -103,11 +105,10 @@
         this._run = false;
         this._requestId = null;
 
-        var _this = this,
-            last = 0;
-
+        var _this = this;
         this._update = function _update() {
-            last = _this._current;
+            var last = _this._current;
+
             _this._current = now();
             _this.dt = (_this._current - last) * 0.001;
 
@@ -117,6 +118,9 @@
                 _this._requestId = window.requestAnimationFrame(_this._update, _this.canvas);
             }
         }
+
+        this.onload = null;
+        this.onupdate = null;
 
         return this.init(
             ((options.value = +options.value) && options.value > 0) ? (options.value <= this.total ? options.value : this.total) : 0
@@ -142,6 +146,7 @@
 
             _this._image = image;
             _this.set(value);
+            if (_this.onload) _this.onload();
         });
 
         return this;
@@ -197,9 +202,6 @@
 
         this.diff = diff;
         this.dir = diff < 0 ? -1 : 1;
-        this.current = this.from;
-
-        console.log(this.current);
 
         this.start();
 
@@ -216,18 +218,22 @@
             image = this._image,
             current = 0;
 
-        console.log(this.current, this.diff, dt);
-
-        this.current += this.diff * dt;
+        this.current += this.diff * this.speed * dt;
         current = this.current;
 
-        console.log(this.current, this.diff, dt);
-
         if (this.dir === 1) {
-            if (current >= this.to) this.stop();
+            if (current >= this.to) {
+                this.stop();
+                this.current = this.to
+            }
         } else {
-            if (current <= this.to) this.stop();
+            if (current <= this.to) {
+                this.stop();
+                this.current = this.to
+            }
         }
+
+        this.onupdate && this.onupdate();
 
         ctx.clearRect(-hw, -hh, w, h);
 
@@ -253,9 +259,11 @@
     };
 
     function drawBar(_this, ctx, dt, w, h) {
+        if (_this.current <= 0) return;
         var offset = h * 0.215,
             lineWidth = w * 0.125,
-            r = (h * 0.9) - lineWidth,
+            r = h * 0.65,
+            angle = (Math.PI * 0.875) + (_this.current * Math.PI * 1.25),
             x = 0,
             y = offset;
 
@@ -265,21 +273,27 @@
         ctx.lineWidth = lineWidth;
 
         ctx.beginPath();
-        ctx.arc(x, y, r, 0, Math.PI, false);
+        ctx.arc(x, y, r, Math.PI * 0.872, angle, false);
         ctx.stroke();
+
+        ctx.fillStyle = this.backgroundColor;
+        ctx.beginPath();
+        ctx.arc(x - (w * 0.03), y, r * 0.95, 0, Math.PI * 2, false);
+        ctx.fill();
 
         ctx.restore();
     }
 
     function drawArrow(_this, ctx, dt, w, h) {
         var offset = h * 0.215,
+            angle = (Math.PI * -0.625) + (_this.current * Math.PI * 1.25),
             x = 0,
             y = offset;
 
         ctx.save();
 
         ctx.translate(x, y);
-        ctx.rotate(0);
+        ctx.rotate(angle);
         ctx.translate(-x, -y);
 
         ctx.fillStyle = _this.backgroundColor;
