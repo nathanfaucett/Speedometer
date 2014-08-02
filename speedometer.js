@@ -379,6 +379,8 @@
         value = +value;
         value = value < 0 ? 0 : (value > total ? total : value);
 
+        if (value === this.value) return this;
+
         this.value = value;
 
         this.to = value / total;
